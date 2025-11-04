@@ -33,44 +33,6 @@
   a.insta{display:inline-flex;align-items:center;gap:8px;background:#E1306C;padding:8px 10px;border-radius:10px;color:white;text-decoration:none}
   .hint{font-size:13px;color:var(--muted);margin-top:8px}
   @media(max-width:880px){.right{width:100%}}
-
-  /* ---- Takip kutusu ek stili ---- */
-  .follow-box {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    background: rgba(6,182,212,0.08);
-    border: 1px solid rgba(6,182,212,0.2);
-    border-radius: 10px;
-    padding: 10px;
-    margin-top: 18px;
-    color: var(--accent);
-    text-align: center;
-    animation: pulseGlow 2.5s infinite ease-in-out;
-  }
-  .follow-text strong {
-    color: #06b6d4;
-    font-size: 15px;
-  }
-  .follow-text span {
-    color: var(--muted);
-    font-size: 13px;
-  }
-  .arrow-left, .arrow-right {
-    font-size: 20px;
-    color: var(--accent);
-    animation: bounce 1.2s infinite alternate;
-  }
-  .arrow-left { transform: rotate(180deg); }
-  @keyframes bounce {
-    from { transform: translateY(0) rotate(180deg); }
-    to { transform: translateY(-4px) rotate(180deg); }
-  }
-  @keyframes pulseGlow {
-    0%,100% { box-shadow: 0 0 8px rgba(6,182,212,0.2); }
-    50% { box-shadow: 0 0 16px rgba(6,182,212,0.4); }
-  }
 </style>
 </head>
 <body>
@@ -143,16 +105,6 @@
         <label>Hakkında</label>
         <div class="muted">Bu uygulama eğitim amaçlı hazırlanmıştır — Atatürk görseli ile kullanıcı görselinin yarılarını birleştirir. Görseller tarayıcı içinde kalır, sunucuya gönderilmez.</div>
 
-        <!-- Takip Etmeyi Unutmayın kutusu -->
-        <div class="follow-box">
-          <div class="arrow-left">➤</div>
-          <div class="follow-text">
-            <strong>Takip etmeyi unutmayın!</strong><br>
-            <span>@volkanogretmn06 hesabında yenilikleri kaçırmayın.</span>
-          </div>
-          <div class="arrow-right">➤</div>
-        </div>
-
         <div style="margin-top:12px">
           <a class="insta" href="https://www.instagram.com/volkanogretmn06" target="_blank" rel="noopener noreferrer">
             <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" style="width:20px;height:20px" alt="insta"/>
@@ -165,13 +117,12 @@
   </div>
 
 <script>
-/* --- JavaScript kısmı (orijinal kodun tamamı) --- */
 // ---- State for two layers ----
 const canvas = document.getElementById('workCanvas');
 const ctx = canvas.getContext('2d', {alpha:true});
 const atFile = document.getElementById('ataturkFile');
 const userFile = document.getElementById('userFile');
-const selectAtBtn = document.getElementById('selectAtatürk');
+const selectAtBtn = document.getElementById('selectAtatürk') || document.getElementById('selectAtatürk') || document.getElementById('selectAtatürk');
 const selectUserBtn = document.getElementById('selectUser');
 const blendBtn = document.getElementById('blendBtn');
 const downloadBtn = document.getElementById('downloadBtn');
@@ -180,17 +131,20 @@ const finalEffectSel = document.getElementById('finalEffect');
 const finalPreviewBox = document.getElementById('finalPreviewBox');
 const finalPreviewImg = document.getElementById('finalPreview');
 
-let activeLayer = 'user';
+let activeLayer = 'user'; // 'atatürk' or 'user'  (default user)
 selectUserBtn.classList.add('active');
 
+// Layer objects: each has image, x,y,scale
 const layers = {
   ataturk: {img:null, x: canvas.width*0.25, y: canvas.height*0.5, scale: 1.0, dragging:false},
   user:   {img:null, x: canvas.width*0.75, y: canvas.height*0.5, scale: 1.0, dragging:false}
 };
 
-let pointers = new Map();
+// pointer tracking for pinch zoom
+let pointers = new Map(); // pointerId -> {x,y}
 let lastPinchDist = null;
 
+// Utility: fit image to canvas height by default
 function defaultScaleFor(img) {
   if(!img) return 1;
   const scaleH = canvas.height / img.height;
@@ -198,6 +152,7 @@ function defaultScaleFor(img) {
   return Math.min(scaleH, scaleW) * 0.95;
 }
 
+// Load image from file input into layer
 function loadFileToLayer(fileInput, layerName) {
   const f = fileInput.files && fileInput.files[0];
   if(!f) return;
@@ -207,6 +162,7 @@ function loadFileToLayer(fileInput, layerName) {
   im.onload = () => {
     layers[layerName].img = im;
     layers[layerName].scale = defaultScaleFor(im);
+    // place center to half area
     layers[layerName].x = (layerName === 'ataturk') ? canvas.width*0.25 : canvas.width*0.75;
     layers[layerName].y = canvas.height/2;
     draw();
@@ -218,6 +174,7 @@ function loadFileToLayer(fileInput, layerName) {
 atFile.addEventListener('change', ()=> loadFileToLayer(atFile, 'ataturk'));
 userFile.addEventListener('change', ()=> loadFileToLayer(userFile, 'user'));
 
+// layer select buttons
 document.getElementById('selectAtatürk').addEventListener('click', ()=> { activeLayer='ataturk'; updateActiveButtons(); });
 document.getElementById('selectUser').addEventListener('click', ()=> { activeLayer='user'; updateActiveButtons(); });
 function updateActiveButtons(){
@@ -225,6 +182,7 @@ function updateActiveButtons(){
   document.getElementById('selectUser').style.background = (activeLayer==='user')? '#0b5566' : '#172a33';
 }
 
+// reset per-layer
 document.getElementById('resetAt').addEventListener('click', () => {
   if(layers.ataturk.img){
     layers.ataturk.scale = defaultScaleFor(layers.ataturk.img);
@@ -242,24 +200,35 @@ document.getElementById('resetUser').addEventListener('click', () => {
   }
 });
 
+// Draw function: draws left half (atatürk) and right half (user) with blend
 function draw() {
+  // clear
   ctx.clearRect(0,0,canvas.width,canvas.height);
+  // background subtle
   ctx.fillStyle = '#07121a';
   ctx.fillRect(0,0,canvas.width,canvas.height);
+
   const bw = parseInt(blendWidthInput.value,10);
+
+  // draw ataturk left half
   if(layers.ataturk.img){
     ctx.save();
+    // compute draw size based on scale
     const im = layers.ataturk.img;
     const w = im.width * layers.ataturk.scale;
     const h = im.height * layers.ataturk.scale;
     const dx = layers.ataturk.x - w/2;
     const dy = layers.ataturk.y - h/2;
+    // clip to left half
     ctx.beginPath();
     ctx.rect(0,0,canvas.width/2,canvas.height);
     ctx.clip();
     ctx.drawImage(im, 0,0,im.width,im.height, dx, dy, w, h);
     ctx.restore();
+    // draw border maybe
   }
+
+  // draw user right half
   if(layers.user.img){
     ctx.save();
     const im = layers.user.img;
@@ -267,18 +236,23 @@ function draw() {
     const h = im.height * layers.user.scale;
     const dx = layers.user.x - w/2;
     const dy = layers.user.y - h/2;
+    // clip to right half
     ctx.beginPath();
     ctx.rect(canvas.width/2,0,canvas.width/2,canvas.height);
     ctx.clip();
     ctx.drawImage(im, 0,0,im.width,im.height, dx, dy, w, h);
     ctx.restore();
   }
+
+  // draw smooth blend/gradient in middle
   const grad = ctx.createLinearGradient(canvas.width/2 - bw/2, 0, canvas.width/2 + bw/2, 0);
   grad.addColorStop(0, 'rgba(0,0,0,0)');
   grad.addColorStop(0.5, 'rgba(0,0,0,0.15)');
   grad.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = grad;
   ctx.fillRect(canvas.width/2 - bw/2, 0, bw, canvas.height);
+
+  // draw guide line
   ctx.strokeStyle = 'rgba(255,255,255,0.06)';
   ctx.beginPath();
   ctx.moveTo(canvas.width/2, 0);
@@ -286,38 +260,51 @@ function draw() {
   ctx.stroke();
 }
 
+// Pointer / mouse interactions for drag + pinch zoom on active layer
 canvas.style.touchAction = 'none';
+
 canvas.addEventListener('pointerdown', (ev) => {
   canvas.setPointerCapture(ev.pointerId);
   pointers.set(ev.pointerId, {x:ev.clientX, y:ev.clientY});
+  // if single pointer -> start dragging active layer if the pointer is near that image area roughly
   if(pointers.size === 1) {
     const p = pointers.get(ev.pointerId);
+    // mark dragging on active layer
     layers[activeLayer].dragging = true;
     layers[activeLayer].dragPointerId = ev.pointerId;
     layers[activeLayer].lastPointer = {x: p.x, y: p.y};
   } else {
+    // if multi-touch start pinch
     lastPinchDist = getPinchDistance();
   }
 });
+
 canvas.addEventListener('pointermove', (ev) => {
   if(!pointers.has(ev.pointerId)) return;
   pointers.set(ev.pointerId, {x:ev.clientX, y:ev.clientY});
   if(pointers.size === 1) {
+    // single pointer drag for the active layer
     const current = pointers.get(ev.pointerId);
     const L = layers[activeLayer];
     if(L.dragging && L.dragPointerId === ev.pointerId){
       const dx = current.x - L.lastPointer.x;
       const dy = current.y - L.lastPointer.y;
-      L.x += dx; L.y += dy;
+      L.x += dx;
+      L.y += dy;
       L.lastPointer = {x: current.x, y: current.y};
       draw();
     }
   } else if(pointers.size >= 2) {
+    // pinch zoom: compute scale factor for active layer
     const dist = getPinchDistance();
     if(lastPinchDist && dist) {
       const factor = dist / lastPinchDist;
       const L = layers[activeLayer];
+      // update scale anchored at canvas center of pinch midpoint
+      const mid = getPinchMidpoint();
+      // slight smoothing
       L.scale *= factor;
+      // clamp
       L.scale = Math.max(0.2, Math.min(5, L.scale));
       lastPinchDist = dist;
       draw();
@@ -326,10 +313,137 @@ canvas.addEventListener('pointermove', (ev) => {
     }
   }
 });
+
 canvas.addEventListener('pointerup', (ev) => {
   pointers.delete(ev.pointerId);
+  // stop dragging if was dragging
+  for(let key of ['atatürk','ataturk','ataturk','user']) {
+    // normalize property names (we use 'ataturk' key)
+  }
   if(layers.ataturk.dragging && layers.ataturk.dragPointerId === ev.pointerId) { layers.ataturk.dragging=false; delete layers.ataturk.dragPointerId;}
   if(layers.user.dragging && layers.user.dragPointerId === ev.pointerId) { layers.user.dragging=false; delete layers.user.dragPointerId;}
   lastPinchDist = null;
 });
-canvas.addEventListener('pointercancel', (ev) => { pointers.delete(ev.pointerId); lastPinchDist = null
+
+canvas.addEventListener('pointercancel', (ev) => {
+  pointers.delete(ev.pointerId);
+  lastPinchDist = null;
+});
+
+// wheel zoom for active layer (mouse)
+canvas.addEventListener('wheel', (ev) => {
+  ev.preventDefault();
+  const L = layers[activeLayer];
+  const delta = -ev.deltaY * 0.0015;
+  L.scale *= (1 + delta);
+  L.scale = Math.max(0.2, Math.min(5, L.scale));
+  draw();
+}, {passive:false});
+
+// helpers
+function getPinchDistance(){
+  const pts = Array.from(pointers.values());
+  if(pts.length<2) return null;
+  const a = pts[0], b = pts[1];
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+function getPinchMidpoint(){
+  const pts = Array.from(pointers.values());
+  if(pts.length<2) return {x: canvas.width/2, y: canvas.height/2};
+  const a = pts[0], b = pts[1];
+  // convert client coords to canvas coords
+  const rect = canvas.getBoundingClientRect();
+  return {x: ((a.x+b.x)/2 - rect.left) * (canvas.width/rect.width), y: ((a.y+b.y)/2 - rect.top) * (canvas.height/rect.height)};
+}
+
+// Blend & final effect
+blendBtn.addEventListener('click', () => {
+  // draw current workCanvas into an offscreen canvas at same size
+  const off = document.createElement('canvas');
+  off.width = canvas.width; off.height = canvas.height;
+  const octx = off.getContext('2d');
+  // draw current view (layers already rendered by draw())
+  // call draw to ensure latest
+  draw();
+  // copy current canvas pixels
+  octx.drawImage(canvas, 0, 0);
+  // apply final effect on offscreen
+  const effect = finalEffectSel.value;
+  if(effect !== 'normal'){
+    const id = octx.getImageData(0,0,off.width,off.height);
+    const d = id.data;
+    for(let i=0;i<d.length;i+=4){
+      let r=d[i], g=d[i+1], b=d[i+2];
+      if(effect==='grayscale'){
+        const avg=(r+g+b)/3; d[i]=d[i+1]=d[i+2]=avg;
+      } else if(effect==='sepia'){
+        d[i]   = Math.min(255, r*0.393 + g*0.769 + b*0.189);
+        d[i+1] = Math.min(255, r*0.349 + g*0.686 + b*0.168);
+        d[i+2] = Math.min(255, r*0.272 + g*0.534 + b*0.131);
+      } else if(effect==='cool'){
+        d[i] = Math.min(255, r*0.9);
+        d[i+1] = Math.min(255, g*0.9);
+        d[i+2] = Math.min(255, b*1.2);
+      }
+    }
+    octx.putImageData(id,0,0);
+  }
+  // show preview
+  finalPreviewBox.style.display = 'block';
+  finalPreviewImg.src = off.toDataURL('image/png');
+});
+
+// download current final preview or current canvas if no preview
+downloadBtn.addEventListener('click', () => {
+  let src;
+  if(finalPreviewImg.src){
+    src = finalPreviewImg.src;
+  } else {
+    // if no preview, draw current view and use canvas data
+    draw();
+    src = canvas.toDataURL('image/png');
+  }
+  const a = document.createElement('a');
+  a.href = src;
+  a.download = 'birlesik-yuz.png';
+  a.click();
+});
+
+// initial draw placeholder
+draw();
+
+// Resize handling: scale canvas pixel size to display size for crispness
+function resizeCanvasToDisplay(){
+  const rect = canvas.getBoundingClientRect();
+  const DPR = window.devicePixelRatio || 1;
+  canvas.width = Math.round(rect.width * DPR);
+  canvas.height = Math.round(rect.height * DPR);
+  // scale contexts accordingly: we already draw in canvas pixels so keep transforms
+  // adjust layers positions relative to new size if desired (simple approach: keep center)
+  // keep existing x,y in pixel coordinates; when resizing we map them proportionally
+  // For simplicity we will re-center layers
+  layers.ataturk.x = canvas.width*0.25;
+  layers.ataturk.y = canvas.height*0.5;
+  layers.user.x = canvas.width*0.75;
+  layers.user.y = canvas.height*0.5;
+  // reset last pinch dist
+  lastPinchDist = null;
+  draw();
+}
+
+// On window resize, adjust canvas CSS height; here we will set canvas display width via CSS
+function fitCanvasDisplay(){
+  const wrap = document.getElementById('canvasWrap');
+  const rect = wrap.getBoundingClientRect();
+  const DPR = window.devicePixelRatio || 1;
+  // set canvas element style width to wrap width, and height to 60vh or fixed ratio
+  canvas.style.width = Math.min(rect.width, 900) + 'px';
+  canvas.style.height = (window.innerHeight*0.5) + 'px';
+  resizeCanvasToDisplay();
+}
+window.addEventListener('resize', ()=> { fitCanvasDisplay(); });
+fitCanvasDisplay();
+
+</script>
+</body>
+</html>
