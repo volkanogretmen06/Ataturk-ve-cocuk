@@ -1,138 +1,305 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Atatürk ile Yüz Birleştirici — Gelişmiş</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Atatürk ile Yüz Birleştirici — Volkan Öğretmen</title>
 <style>
-  :root{
-    --bg:#07121a; --card:#0f1721; --accent:#06b6d4; --muted:#9ca3af;
-  }
-  html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;color:#e6eef6;background:linear-gradient(180deg,#031220,#071629);-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:1100px;margin:18px auto;padding:16px;}
-  header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  h1{font-size:20px;margin:0;color:var(--accent)}
-  .top-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
-  .card{background:rgba(255,255,255,0.03);padding:12px;border-radius:10px;box-shadow:0 8px 20px rgba(2,6,23,0.6)}
-  .left{flex:1;min-width:320px}
-  .right{width:360px;min-width:280px}
-  label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
-  .file-btn{display:inline-block;padding:8px 10px;background:#0b3954;border-radius:8px;color:#dff7ff;cursor:pointer}
-  .small{font-size:13px;color:var(--muted)}
-  #canvasWrap{position:relative;margin-top:12px;border-radius:12px;overflow:hidden;background:#000;touch-action:none;border:1px solid rgba(255,255,255,0.03)}
-  canvas{display:block;width:100%;height:auto;max-height:640px}
-  .controls-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
-  select,input[type=range]{width:100%;}
-  button{background:var(--accent);border:none;padding:8px 12px;border-radius:8px;color:#04202a;font-weight:700;cursor:pointer}
-  .muted{color:var(--muted);font-size:13px}
-  .layer-select{display:flex;gap:8px;margin-top:8px}
-  .layer-select button{background:#172a33;color:#cfeff4}
-  .preview-final{margin-top:12px;border-radius:8px;overflow:hidden;background:#071524;padding:10px;text-align:center}
-  .preview-final img{max-width:100%;height:auto;border-radius:6px}
-  footer{margin-top:18px;color:#97a3ad;font-size:13px;text-align:center}
-  a.insta{display:inline-flex;align-items:center;gap:8px;background:#E1306C;padding:8px 10px;border-radius:10px;color:white;text-decoration:none}
-  .hint{font-size:13px;color:var(--muted);margin-top:8px}
-  .arrow-text{
-    margin-top:8px;
-    color:#E1306C;
-    font-weight:bold;
-    font-size:14px;
-    text-align:center;
-    animation: bounce 1.2s infinite;
-  }
-  @keyframes bounce {
-    0%,100%{transform:translateY(0);}
-    50%{transform:translateY(-4px);}
-  }
-  @media(max-width:880px){.right{width:100%}}
+body {
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at top, #0a0a0a, #1e1e1e);
+  color: #fff;
+  margin: 0;
+  text-align: center;
+}
+.container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 20px;
+}
+h1 {
+  color: #06b6d4;
+  margin-bottom: 10px;
+}
+.card {
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 15px;
+}
+label {
+  display: block;
+  margin-bottom: 6px;
+  color: #ccc;
+}
+input[type="file"] {
+  display: block;
+  margin: 5px auto 10px;
+}
+.preview {
+  margin: 10px auto;
+  display: flex;
+  justify-content: space-around;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.preview img {
+  max-width: 45%;
+  border-radius: 8px;
+  border: 2px solid #06b6d4;
+}
+canvas {
+  margin-top: 10px;
+  width: 100%;
+  max-width: 900px;
+  border-radius: 12px;
+  background: #000;
+  touch-action: none;
+}
+button {
+  background: #06b6d4;
+  border: none;
+  padding: 10px 15px;
+  margin: 10px 5px;
+  border-radius: 8px;
+  color: #04202a;
+  font-weight: bold;
+  cursor: pointer;
+}
+button:hover {
+  background: #0891b2;
+}
+select {
+  margin: 10px 0;
+  padding: 6px;
+  border-radius: 8px;
+  border: none;
+}
+footer {
+  margin-top: 30px;
+  font-size: 14px;
+  color: #aaa;
+}
+a.insta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #E1306C;
+  padding: 8px 10px;
+  border-radius: 10px;
+  color: white;
+  text-decoration: none;
+}
+.arrow-text {
+  margin-top: 8px;
+  color: #E1306C;
+  font-weight: bold;
+  font-size: 15px;
+  animation: bounce 1.2s infinite;
+}
+@keyframes bounce {
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-4px);}
+}
 </style>
 </head>
 <body>
-  <div class="wrap card">
-    <header>
-      <h1>Atatürk ile Yüz Birleştirici — Gelişmiş</h1>
-      <div class="small">Kullanıcı: <strong>Volkan Öğretmen</strong></div>
-    </header>
+<div class="container">
+  <h1>Atatürk ile Yüz Birleştirici</h1>
+  <p>Atatürk'ün yüzünün yarısı ile kendi fotoğrafınızı birleştirin. 📸</p>
 
-    <div class="top-row">
-      <div class="left card">
-        <label>1) Katman seç — hangi resmi düzenlemek istiyorsunuz?</label>
-        <div class="layer-select">
-          <button id="selectAtatürk">Atatürk Görseli</button>
-          <button id="selectUser">Kullanıcı Görseli</button>
-        </div>
+  <div class="card">
+    <label>1️⃣ Atatürk Görselini Yükle (sol taraf)</label>
+    <input type="file" id="atatürkInput" accept="image/*">
 
-        <div id="canvasWrap" style="margin-top:10px">
-          <canvas id="workCanvas" width="900" height="600"></canvas>
-        </div>
+    <label>2️⃣ Kendi Fotoğrafınızı Yükleyin (sağ taraf)</label>
+    <input type="file" id="userInput" accept="image/*">
 
-        <div class="controls-row">
-          <button id="blendBtn">Birleştir ve Önizle</button>
-          <button id="downloadBtn">Finali İndir</button>
-          <div style="flex:1"></div>
-          <div class="muted">Yakınlaştırma: fare tekeri / dokunmatik: iki parmak</div>
-        </div>
-
-        <div style="margin-top:10px" class="card">
-          <label>Geçiş genişliği (pix)</label>
-          <input id="blendWidth" type="range" min="10" max="200" value="80">
-        </div>
-
-        <div style="margin-top:10px" class="card">
-          <label>Final Efekt</label>
-          <select id="finalEffect">
-            <option value="normal">Normal</option>
-            <option value="grayscale">Siyah-Beyaz</option>
-            <option value="sepia">Sepya</option>
-            <option value="cool">Soğuk Ton</option>
-          </select>
-        </div>
-
-        <div class="preview-final card" id="finalPreviewBox" style="display:none">
-          <div><strong>Final Önizleme</strong></div>
-          <img id="finalPreview" alt="Final preview"/>
-        </div>
-      </div>
-
-      <div class="right card">
-        <label>Atatürk Görseli (sol yarı için)</label>
-        <input id="ataturkFile" type="file" accept="image/*" />
-        <div class="hint">Yüklenen görsel otomatik olarak katmana eklenir.</div>
-        <hr style="margin:10px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
-
-        <label>Kullanıcı Görseli (sağ yarı için)</label>
-        <input id="userFile" type="file" accept="image/*" />
-        <div class="hint">Önizlemeyi kullanarak hizalama yapın.</div>
-
-        <hr style="margin:10px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
-
-        <label>Seçili Katmanın Başlangıç Ayarlarını Sıfırla</label>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button id="resetAt">Sıfırla (Atatürk)</button>
-          <button id="resetUser">Sıfırla (Kullanıcı)</button>
-        </div>
-
-        <hr style="margin:10px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
-
-        <label>Hakkında</label>
-        <div class="muted">Bu uygulama eğitim amaçlı hazırlanmıştır — Atatürk görseli ile kullanıcı görselinin yarılarını birleştirir. Görseller tarayıcı içinde kalır, sunucuya gönderilmez.</div>
-
-        <div style="margin-top:12px; text-align:center;">
-          <a class="insta" href="https://www.instagram.com/volkanogretmn06" target="_blank" rel="noopener noreferrer">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" style="width:20px;height:20px" alt="insta"/>
-            @volkanogretmn06
-          </a>
-          <div class="arrow-text">⬇️⬇️ Takip etmeyi unutmayın ⬇️⬇️</div>
-        </div>
-      </div>
-    </div>
-
+    <div class="preview" id="previewArea"></div>
   </div>
 
-<!-- JavaScript kısmı (önceki sürümle aynı) -->
+  <div class="card">
+    <canvas id="canvas" width="900" height="600"></canvas>
+    <div>
+      <label>Yakınlaştırma / Uzaklaştırma: İki parmakla veya fare tekeriyle</label>
+    </div>
+    <button id="blendBtn">Birleştir ve Önizle</button>
+    <button id="downloadBtn">İndir</button>
+    <select id="effectSelect">
+      <option value="normal">Normal</option>
+      <option value="grayscale">Siyah Beyaz</option>
+      <option value="sepia">Sepya</option>
+      <option value="cool">Soğuk Ton</option>
+    </select>
+  </div>
+
+  <div class="card" id="finalPreviewCard" style="display:none;">
+    <h3>Birleştirilmiş Görsel</h3>
+    <img id="finalPreview" alt="Final Önizleme" style="max-width:100%;border-radius:8px;">
+  </div>
+
+  <footer>
+    <div>
+      <a class="insta" href="https://www.instagram.com/volkanogretmn06" target="_blank">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" width="20" height="20" alt="insta">
+        @volkanogretmn06
+      </a>
+      <div class="arrow-text">⬇️⬇️ Takip etmeyi unutmayın ⬇️⬇️</div>
+    </div>
+    <p>Hazırlayan: Volkan Öğretmen | Eğitim Amaçlı Uygulama</p>
+  </footer>
+</div>
+
 <script>
-/* Burada önceki uzun JavaScript kodun birebir aynı kalacak.
-   Yalnızca HTML kısmına yukarıdaki eklemeyi yaptık. */
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const atInput = document.getElementById('atatürkInput');
+const userInput = document.getElementById('userInput');
+const previewArea = document.getElementById('previewArea');
+const blendBtn = document.getElementById('blendBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const finalPreview = document.getElementById('finalPreview');
+const finalPreviewCard = document.getElementById('finalPreviewCard');
+const effectSelect = document.getElementById('effectSelect');
+
+let atImg = new Image();
+let userImg = new Image();
+let scale = 1;
+let posX = 0, posY = 0;
+let isDragging = false, lastX = 0, lastY = 0;
+
+function updatePreview() {
+  previewArea.innerHTML = '';
+  if (atImg.src) {
+    const img1 = document.createElement('img');
+    img1.src = atImg.src;
+    previewArea.appendChild(img1);
+  }
+  if (userImg.src) {
+    const img2 = document.createElement('img');
+    img2.src = userImg.src;
+    previewArea.appendChild(img2);
+  }
+  draw();
+}
+
+atInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = evt => {
+    atImg.src = evt.target.result;
+    atImg.onload = updatePreview;
+  };
+  reader.readAsDataURL(file);
+});
+
+userInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = evt => {
+    userImg.src = evt.target.result;
+    userImg.onload = updatePreview;
+  };
+  reader.readAsDataURL(file);
+});
+
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  if (!atImg.src || !userImg.src) return;
+
+  const halfW = canvas.width/2;
+  const height = canvas.height;
+
+  const drawH = atImg.height * scale;
+  const drawW = atImg.width * scale;
+  const dx = posX + halfW - drawW/2;
+  const dy = posY + height/2 - drawH/2;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0,0,halfW,canvas.height);
+  ctx.clip();
+  ctx.drawImage(atImg,dx,dy,drawW,drawH);
+  ctx.restore();
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(halfW,0,halfW,canvas.height);
+  ctx.clip();
+  ctx.drawImage(userImg,dx,dy,drawW,drawH);
+  ctx.restore();
+
+  const grad = ctx.createLinearGradient(halfW-30,0,halfW+30,0);
+  grad.addColorStop(0,'rgba(0,0,0,0)');
+  grad.addColorStop(0.5,'rgba(0,0,0,0.3)');
+  grad.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(halfW-30,0,60,canvas.height);
+}
+
+canvas.addEventListener('mousedown', e => {
+  isDragging = true;
+  lastX = e.offsetX;
+  lastY = e.offsetY;
+});
+canvas.addEventListener('mouseup', ()=> isDragging=false);
+canvas.addEventListener('mousemove', e => {
+  if (!isDragging) return;
+  posX += e.offsetX - lastX;
+  posY += e.offsetY - lastY;
+  lastX = e.offsetX;
+  lastY = e.offsetY;
+  draw();
+});
+
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const delta = e.deltaY < 0 ? 1.1 : 0.9;
+  scale *= delta;
+  scale = Math.max(0.3, Math.min(scale, 3));
+  draw();
+});
+
+blendBtn.addEventListener('click', () => {
+  const off = document.createElement('canvas');
+  off.width = canvas.width;
+  off.height = canvas.height;
+  const octx = off.getContext('2d');
+  octx.drawImage(canvas,0,0);
+
+  const eff = effectSelect.value;
+  if (eff !== 'normal') {
+    const imgData = octx.getImageData(0,0,off.width,off.height);
+    const d = imgData.data;
+    for (let i=0; i<d.length; i+=4) {
+      let r=d[i],g=d[i+1],b=d[i+2];
+      if (eff==='grayscale') {
+        const avg=(r+g+b)/3; d[i]=d[i+1]=d[i+2]=avg;
+      } else if (eff==='sepia') {
+        d[i]=Math.min(255,r*0.393+g*0.769+b*0.189);
+        d[i+1]=Math.min(255,r*0.349+g*0.686+b*0.168);
+        d[i+2]=Math.min(255,r*0.272+g*0.534+b*0.131);
+      } else if (eff==='cool') {
+        d[i]=r*0.9; d[i+1]=g*0.9; d[i+2]=Math.min(255,b*1.2);
+      }
+    }
+    octx.putImageData(imgData,0,0);
+  }
+
+  finalPreview.src = off.toDataURL('image/png');
+  finalPreviewCard.style.display = 'block';
+});
+
+downloadBtn.addEventListener('click', ()=>{
+  const a = document.createElement('a');
+  a.download = 'birlesik-yuz.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+});
 </script>
 </body>
 </html>
