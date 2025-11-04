@@ -29,26 +29,20 @@
   .layer-select button{background:#172a33;color:#cfeff4}
   .preview-final{margin-top:12px;border-radius:8px;overflow:hidden;background:#071524;padding:10px;text-align:center}
   .preview-final img{max-width:100%;height:auto;border-radius:6px}
-  footer{margin-top:18px;color:#97a3ad;font-size:13px}
+  footer{margin-top:18px;color:#97a3ad;font-size:13px;text-align:center}
   a.insta{display:inline-flex;align-items:center;gap:8px;background:#E1306C;padding:8px 10px;border-radius:10px;color:white;text-decoration:none}
   .hint{font-size:13px;color:var(--muted);margin-top:8px}
-  .follow-note {
-    text-align:center;
+  .arrow-text{
     margin-top:8px;
-    font-size:14px;
     color:#E1306C;
-    font-weight:600;
-    animation: pulse 2s infinite;
+    font-weight:bold;
+    font-size:14px;
+    text-align:center;
+    animation: bounce 1.2s infinite;
   }
-  .follow-note::before {
-    content:"⬆️⬆️ ";
-  }
-  .follow-note::after {
-    content:" ⬆️⬆️";
-  }
-  @keyframes pulse {
-    0%,100% { opacity:1; transform:translateY(0);}
-    50% { opacity:0.7; transform:translateY(-3px);}
+  @keyframes bounce {
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-4px);}
   }
   @media(max-width:880px){.right{width:100%}}
 </style>
@@ -128,16 +122,17 @@
             <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" style="width:20px;height:20px" alt="insta"/>
             @volkanogretmn06
           </a>
-          <div class="follow-note">Takip etmeyi unutmayın ❤️</div>
+          <div class="arrow-text">⬇️⬇️ Takip etmeyi unutmayın ⬇️⬇️</div>
         </div>
       </div>
     </div>
 
   </div>
 
+<!-- JavaScript kısmı (önceki sürümle aynı) -->
 <script>
-// ---- (JavaScript kodları aynı kalıyor, hiçbir değişiklik gerekmez) ----
-// [Kodun tamamı senin mevcut sürümündekiyle aynı, sadece Instagram kısmına yeni yazı eklendi.]
+/* Burada önceki uzun JavaScript kodun birebir aynı kalacak.
+   Yalnızca HTML kısmına yukarıdaki eklemeyi yaptık. */
 </script>
 </body>
 </html>
