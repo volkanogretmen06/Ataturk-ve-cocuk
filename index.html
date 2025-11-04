@@ -1,297 +1,449 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Atatürk ile Yüz Birleştirici</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: "Poppins", sans-serif;
-      background: radial-gradient(circle at top, #0a0a0a, #1e1e1e);
-      color: white;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-    }
-    h1 {
-      margin-top: 20px;
-      font-size: 1.8rem;
-      color: #f4f4f4;
-    }
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .upload-section {
-      display: flex;
-      justify-content: space-around;
-      flex-wrap: wrap;
-      margin-top: 20px;
-    }
-    .upload-box {
-      background: #1e1e1e;
-      border: 2px dashed #555;
-      border-radius: 12px;
-      padding: 15px;
-      width: 260px;
-      text-align: center;
-    }
-    .upload-box input {
-      display: none;
-    }
-    .upload-box label {
-      background: #0b3954;
-      color: white;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      display: inline-block;
-      margin-top: 8px;
-    }
-    img.preview {
-      width: 100%;
-      margin-top: 10px;
-      border-radius: 8px;
-      display: none;
-    }
-    canvas {
-      border: 2px solid #555;
-      border-radius: 12px;
-      margin-top: 20px;
-      background: #111;
-      touch-action: none;
-      width: 100%;
-      max-width: 700px;
-      height: auto;
-    }
-    select, button {
-      margin: 10px;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-    button {
-      background: #0b3954;
-      color: white;
-      transition: 0.3s;
-    }
-    button:hover {
-      background: #124c73;
-    }
-    .footer {
-      margin-top: 40px;
-      padding: 20px;
-      background: #0d0d0d;
-      border-top: 1px solid #333;
-      font-size: 0.95rem;
-    }
-    .footer a {
-      color: #E1306C;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    .footer img {
-      width: 22px;
-      height: 22px;
-      vertical-align: middle;
-      margin-right: 5px;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Atatürk ile Yüz Birleştirici — Gelişmiş</title>
+<style>
+  :root{
+    --bg:#07121a; --card:#0f1721; --accent:#06b6d4; --muted:#9ca3af;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;color:#e6eef6;background:linear-gradient(180deg,#031220,#071629);-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1100px;margin:18px auto;padding:16px;}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  h1{font-size:20px;margin:0;color:var(--accent)}
+  .top-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+  .card{background:rgba(255,255,255,0.03);padding:12px;border-radius:10px;box-shadow:0 8px 20px rgba(2,6,23,0.6)}
+  .left{flex:1;min-width:320px}
+  .right{width:360px;min-width:280px}
+  label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+  .file-btn{display:inline-block;padding:8px 10px;background:#0b3954;border-radius:8px;color:#dff7ff;cursor:pointer}
+  .small{font-size:13px;color:var(--muted)}
+  #canvasWrap{position:relative;margin-top:12px;border-radius:12px;overflow:hidden;background:#000;touch-action:none;border:1px solid rgba(255,255,255,0.03)}
+  canvas{display:block;width:100%;height:auto;max-height:640px}
+  .controls-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+  select,input[type=range]{width:100%;}
+  button{background:var(--accent);border:none;padding:8px 12px;border-radius:8px;color:#04202a;font-weight:700;cursor:pointer}
+  .muted{color:var(--muted);font-size:13px}
+  .layer-select{display:flex;gap:8px;margin-top:8px}
+  .layer-select button{background:#172a33;color:#cfeff4}
+  .preview-final{margin-top:12px;border-radius:8px;overflow:hidden;background:#071524;padding:10px;text-align:center}
+  .preview-final img{max-width:100%;height:auto;border-radius:6px}
+  footer{margin-top:18px;color:#97a3ad;font-size:13px}
+  a.insta{display:inline-flex;align-items:center;gap:8px;background:#E1306C;padding:8px 10px;border-radius:10px;color:white;text-decoration:none}
+  .hint{font-size:13px;color:var(--muted);margin-top:8px}
+  @media(max-width:880px){.right{width:100%}}
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>🖼️ Atatürk ile Yüz Birleştirici</h1>
-    <p>Atatürk'ün fotoğrafıyla kendi fotoğrafınızı birleştirip özel bir portre oluşturun.</p>
+  <div class="wrap card">
+    <header>
+      <h1>Atatürk ile Yüz Birleştirici — Gelişmiş</h1>
+      <div class="small">Kullanıcı: <strong>Volkan Öğretmen</strong></div>
+    </header>
 
-    <div class="upload-section">
-      <div class="upload-box">
-        <p><strong>1️⃣ Atatürk Fotoğrafı</strong></p>
-        <input type="file" id="ataturkUpload" accept="image/*">
-        <label for="ataturkUpload">Fotoğraf Yükle</label>
-        <img id="ataturkPreview" class="preview">
+    <div class="top-row">
+      <div class="left card">
+        <label>1) Katman seç — hangi resmi düzenlemek istiyorsunuz?</label>
+        <div class="layer-select">
+          <button id="selectAtatürk">Atatürk Görseli</button>
+          <button id="selectUser">Kullanıcı Görseli</button>
+        </div>
+
+        <div id="canvasWrap" style="margin-top:10px">
+          <canvas id="workCanvas" width="900" height="600"></canvas>
+        </div>
+
+        <div class="controls-row">
+          <button id="blendBtn">Birleştir ve Önizle</button>
+          <button id="downloadBtn">Finali İndir</button>
+          <div style="flex:1"></div>
+          <div class="muted">Yakınlaştırma: fare tekeri / dokunmatik: iki parmak</div>
+        </div>
+
+        <div style="margin-top:10px" class="card">
+          <label>Geçiş genişliği (pix)</label>
+          <input id="blendWidth" type="range" min="10" max="200" value="80">
+        </div>
+
+        <div style="margin-top:10px" class="card">
+          <label>Final Efekt</label>
+          <select id="finalEffect">
+            <option value="normal">Normal</option>
+            <option value="grayscale">Siyah-Beyaz</option>
+            <option value="sepia">Sepya</option>
+            <option value="cool">Soğuk Ton</option>
+          </select>
+        </div>
+
+        <div class="preview-final card" id="finalPreviewBox" style="display:none">
+          <div><strong>Final Önizleme</strong></div>
+          <img id="finalPreview" alt="Final preview"/>
+        </div>
       </div>
 
-      <div class="upload-box">
-        <p><strong>2️⃣ Kendi Fotoğrafın</strong></p>
-        <input type="file" id="userUpload" accept="image/*">
-        <label for="userUpload">Fotoğraf Yükle</label>
-        <img id="userPreview" class="preview">
+      <div class="right card">
+        <label>Atatürk Görseli (sol yarı için)</label>
+        <input id="ataturkFile" type="file" accept="image/*" />
+        <div class="hint">Yüklenen görsel otomatik olarak katmana eklenir.</div>
+        <hr style="margin:10px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+
+        <label>Kullanıcı Görseli (sağ yarı için)</label>
+        <input id="userFile" type="file" accept="image/*" />
+        <div class="hint">Önizlemeyi kullanarak hizalama yapın.</div>
+
+        <hr style="margin:10px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+
+        <label>Seçili Katmanın Başlangıç Ayarlarını Sıfırla</label>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="resetAt">Sıfırla (Atatürk)</button>
+          <button id="resetUser">Sıfırla (Kullanıcı)</button>
+        </div>
+
+        <hr style="margin:10px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+
+        <label>Hakkında</label>
+        <div class="muted">Bu uygulama eğitim amaçlı hazırlanmıştır — Atatürk görseli ile kullanıcı görselinin yarılarını birleştirir. Görseller tarayıcı içinde kalır, sunucuya gönderilmez.</div>
+
+        <div style="margin-top:12px">
+          <a class="insta" href="https://www.instagram.com/volkanogretmn06" target="_blank" rel="noopener noreferrer">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" style="width:20px;height:20px" alt="insta"/>
+            @volkanogretmn06
+          </a>
+        </div>
       </div>
     </div>
 
-    <canvas id="previewCanvas" width="700" height="500"></canvas>
-
-    <div>
-      <label>🎨 Efekt:</label>
-      <select id="effectSelect">
-        <option value="none">Normal</option>
-        <option value="bw">Siyah-Beyaz</option>
-        <option value="sepia">Sepya</option>
-        <option value="cold">Soğuk Ton</option>
-      </select>
-    </div>
-
-    <div>
-      <button id="mergeButton">Birleştir</button>
-      <button id="downloadButton" style="display:none;">Finali İndir</button>
-      <select id="downloadQuality" style="padding:6px 8px;border-radius:8px;border:none;background:#0b3954;color:white">
-        <option value="1">Yüksek Kalite</option>
-        <option value="0.7">Orta Kalite</option>
-        <option value="0.4">Düşük Kalite</option>
-      </select>
-    </div>
-
-    <div class="footer">
-      <p>Bu proje, öğrenciler ve öğretmenler için <strong>yaratıcı bir Atatürk anısı</strong> oluşturmayı amaçlar.</p>
-      <a href="https://www.instagram.com/volkanogretmn06" target="_blank" rel="noopener noreferrer">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" />
-        @volkanogretmn06
-      </a>
-      <div style="margin-top:6px;font-size:14px;color:#E1306C;font-weight:600">
-        ↑ Takip etmeyi unutmayın ❤️ ↑
-      </div>
-    </div>
   </div>
 
-  <script>
-  const canvas = document.getElementById("previewCanvas");
-  const ctx = canvas.getContext("2d");
+<script>
+// ---- State for two layers ----
+const canvas = document.getElementById('workCanvas');
+const ctx = canvas.getContext('2d', {alpha:true});
+const atFile = document.getElementById('ataturkFile');
+const userFile = document.getElementById('userFile');
+const selectAtBtn = document.getElementById('selectAtatürk') || document.getElementById('selectAtatürk') || document.getElementById('selectAtatürk');
+const selectUserBtn = document.getElementById('selectUser');
+const blendBtn = document.getElementById('blendBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const blendWidthInput = document.getElementById('blendWidth');
+const finalEffectSel = document.getElementById('finalEffect');
+const finalPreviewBox = document.getElementById('finalPreviewBox');
+const finalPreviewImg = document.getElementById('finalPreview');
 
-  const ataturkInput = document.getElementById("ataturkUpload");
-  const userInput = document.getElementById("userUpload");
-  const ataturkPreview = document.getElementById("ataturkPreview");
-  const userPreview = document.getElementById("userPreview");
-  const effectSelect = document.getElementById("effectSelect");
-  const mergeButton = document.getElementById("mergeButton");
-  const downloadButton = document.getElementById("downloadButton");
-  const downloadQuality = document.getElementById("downloadQuality");
+let activeLayer = 'user'; // 'atatürk' or 'user'  (default user)
+selectUserBtn.classList.add('active');
 
-  let ataturkImg = new Image();
-  let userImg = new Image();
-  let ataturkPos = { x: 0, y: 0, scale: 1 };
-  let userPos = { x: canvas.width / 2, y: 0, scale: 1 };
-  let dragging = null;
-  let mergedImage = null;
+// Layer objects: each has image, x,y,scale
+const layers = {
+  ataturk: {img:null, x: canvas.width*0.25, y: canvas.height*0.5, scale: 1.0, dragging:false},
+  user:   {img:null, x: canvas.width*0.75, y: canvas.height*0.5, scale: 1.0, dragging:false}
+};
 
-  function loadImage(event, imageObj, previewEl) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      imageObj.src = e.target.result;
-      previewEl.src = e.target.result;
-      previewEl.style.display = "block";
-      drawCanvas();
-    };
-    reader.readAsDataURL(file);
+// pointer tracking for pinch zoom
+let pointers = new Map(); // pointerId -> {x,y}
+let lastPinchDist = null;
+
+// Utility: fit image to canvas height by default
+function defaultScaleFor(img) {
+  if(!img) return 1;
+  const scaleH = canvas.height / img.height;
+  const scaleW = (canvas.width/2) / img.width;
+  return Math.min(scaleH, scaleW) * 0.95;
+}
+
+// Load image from file input into layer
+function loadFileToLayer(fileInput, layerName) {
+  const f = fileInput.files && fileInput.files[0];
+  if(!f) return;
+  const url = URL.createObjectURL(f);
+  const im = new Image();
+  im.crossOrigin = 'anonymous';
+  im.onload = () => {
+    layers[layerName].img = im;
+    layers[layerName].scale = defaultScaleFor(im);
+    // place center to half area
+    layers[layerName].x = (layerName === 'ataturk') ? canvas.width*0.25 : canvas.width*0.75;
+    layers[layerName].y = canvas.height/2;
+    draw();
+    URL.revokeObjectURL(url);
+  };
+  im.src = url;
+}
+
+atFile.addEventListener('change', ()=> loadFileToLayer(atFile, 'ataturk'));
+userFile.addEventListener('change', ()=> loadFileToLayer(userFile, 'user'));
+
+// layer select buttons
+document.getElementById('selectAtatürk').addEventListener('click', ()=> { activeLayer='ataturk'; updateActiveButtons(); });
+document.getElementById('selectUser').addEventListener('click', ()=> { activeLayer='user'; updateActiveButtons(); });
+function updateActiveButtons(){
+  document.getElementById('selectAtatürk').style.background = (activeLayer==='ataturk')? '#0b5566' : '#172a33';
+  document.getElementById('selectUser').style.background = (activeLayer==='user')? '#0b5566' : '#172a33';
+}
+
+// reset per-layer
+document.getElementById('resetAt').addEventListener('click', () => {
+  if(layers.ataturk.img){
+    layers.ataturk.scale = defaultScaleFor(layers.ataturk.img);
+    layers.ataturk.x = canvas.width*0.25;
+    layers.ataturk.y = canvas.height/2;
+    draw();
+  }
+});
+document.getElementById('resetUser').addEventListener('click', () => {
+  if(layers.user.img){
+    layers.user.scale = defaultScaleFor(layers.user.img);
+    layers.user.x = canvas.width*0.75;
+    layers.user.y = canvas.height/2;
+    draw();
+  }
+});
+
+// Draw function: draws left half (atatürk) and right half (user) with blend
+function draw() {
+  // clear
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // background subtle
+  ctx.fillStyle = '#07121a';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  const bw = parseInt(blendWidthInput.value,10);
+
+  // draw ataturk left half
+  if(layers.ataturk.img){
+    ctx.save();
+    // compute draw size based on scale
+    const im = layers.ataturk.img;
+    const w = im.width * layers.ataturk.scale;
+    const h = im.height * layers.ataturk.scale;
+    const dx = layers.ataturk.x - w/2;
+    const dy = layers.ataturk.y - h/2;
+    // clip to left half
+    ctx.beginPath();
+    ctx.rect(0,0,canvas.width/2,canvas.height);
+    ctx.clip();
+    ctx.drawImage(im, 0,0,im.width,im.height, dx, dy, w, h);
+    ctx.restore();
+    // draw border maybe
   }
 
-  ataturkInput.addEventListener("change", (e) => loadImage(e, ataturkImg, ataturkPreview));
-  userInput.addEventListener("change", (e) => loadImage(e, userImg, userPreview));
-
-  function drawCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (ataturkImg.src)
-      ctx.drawImage(ataturkImg, ataturkPos.x, ataturkPos.y, ataturkImg.width * ataturkPos.scale, ataturkImg.height * ataturkPos.scale);
-    if (userImg.src) {
-      ctx.globalAlpha = 0.8;
-      ctx.drawImage(userImg, userPos.x, userPos.y, userImg.width * userPos.scale, userImg.height * userPos.scale);
-      ctx.globalAlpha = 1.0;
-    }
+  // draw user right half
+  if(layers.user.img){
+    ctx.save();
+    const im = layers.user.img;
+    const w = im.width * layers.user.scale;
+    const h = im.height * layers.user.scale;
+    const dx = layers.user.x - w/2;
+    const dy = layers.user.y - h/2;
+    // clip to right half
+    ctx.beginPath();
+    ctx.rect(canvas.width/2,0,canvas.width/2,canvas.height);
+    ctx.clip();
+    ctx.drawImage(im, 0,0,im.width,im.height, dx, dy, w, h);
+    ctx.restore();
   }
 
-  let lastX, lastY;
-  canvas.addEventListener("mousedown", (e) => {
-    lastX = e.offsetX;
-    lastY = e.offsetY;
-    dragging = getActiveImage(e.offsetX, e.offsetY);
-  });
-  canvas.addEventListener("mousemove", (e) => {
-    if (!dragging) return;
-    const dx = e.offsetX - lastX;
-    const dy = e.offsetY - lastY;
-    lastX = e.offsetX;
-    lastY = e.offsetY;
-    dragging.x += dx;
-    dragging.y += dy;
-    drawCanvas();
-  });
-  canvas.addEventListener("mouseup", () => (dragging = null));
-  canvas.addEventListener("wheel", (e) => {
-    e.preventDefault();
-    const zoom = e.deltaY < 0 ? 1.1 : 0.9;
-    const active = getActiveImage(e.offsetX, e.offsetY);
-    if (active) {
-      active.scale *= zoom;
-      drawCanvas();
-    }
-  });
-  function getActiveImage() {
-    if (userImg.src) return userPos;
-    if (ataturkImg.src) return ataturkPos;
-    return null;
+  // draw smooth blend/gradient in middle
+  const grad = ctx.createLinearGradient(canvas.width/2 - bw/2, 0, canvas.width/2 + bw/2, 0);
+  grad.addColorStop(0, 'rgba(0,0,0,0)');
+  grad.addColorStop(0.5, 'rgba(0,0,0,0.15)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(canvas.width/2 - bw/2, 0, bw, canvas.height);
+
+  // draw guide line
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.beginPath();
+  ctx.moveTo(canvas.width/2, 0);
+  ctx.lineTo(canvas.width/2, canvas.height);
+  ctx.stroke();
+}
+
+// Pointer / mouse interactions for drag + pinch zoom on active layer
+canvas.style.touchAction = 'none';
+
+canvas.addEventListener('pointerdown', (ev) => {
+  canvas.setPointerCapture(ev.pointerId);
+  pointers.set(ev.pointerId, {x:ev.clientX, y:ev.clientY});
+  // if single pointer -> start dragging active layer if the pointer is near that image area roughly
+  if(pointers.size === 1) {
+    const p = pointers.get(ev.pointerId);
+    // mark dragging on active layer
+    layers[activeLayer].dragging = true;
+    layers[activeLayer].dragPointerId = ev.pointerId;
+    layers[activeLayer].lastPointer = {x: p.x, y: p.y};
+  } else {
+    // if multi-touch start pinch
+    lastPinchDist = getPinchDistance();
   }
+});
 
-  mergeButton.addEventListener("click", () => {
-    if (!ataturkImg.src || !userImg.src) {
-      alert("Lütfen iki fotoğraf da yüklensin.");
-      return;
+canvas.addEventListener('pointermove', (ev) => {
+  if(!pointers.has(ev.pointerId)) return;
+  pointers.set(ev.pointerId, {x:ev.clientX, y:ev.clientY});
+  if(pointers.size === 1) {
+    // single pointer drag for the active layer
+    const current = pointers.get(ev.pointerId);
+    const L = layers[activeLayer];
+    if(L.dragging && L.dragPointerId === ev.pointerId){
+      const dx = current.x - L.lastPointer.x;
+      const dy = current.y - L.lastPointer.y;
+      L.x += dx;
+      L.y += dy;
+      L.lastPointer = {x: current.x, y: current.y};
+      draw();
     }
-    const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = canvas.width;
-    tempCanvas.height = canvas.height;
-    const tctx = tempCanvas.getContext("2d");
-    tctx.drawImage(ataturkImg, ataturkPos.x, ataturkPos.y, ataturkImg.width * ataturkPos.scale, ataturkImg.height * ataturkPos.scale);
-    tctx.save();
-    tctx.beginPath();
-    tctx.rect(canvas.width / 2, 0, canvas.width / 2, canvas.height);
-    tctx.clip();
-    tctx.drawImage(userImg, userPos.x, userPos.y, userImg.width * userPos.scale, userImg.height * userPos.scale);
-    tctx.restore();
-    applyEffect(tctx, tempCanvas, effectSelect.value);
-    mergedImage = tempCanvas.toDataURL();
-    downloadButton.style.display = "inline-block";
-    ctx.drawImage(tempCanvas, 0, 0);
-  });
+  } else if(pointers.size >= 2) {
+    // pinch zoom: compute scale factor for active layer
+    const dist = getPinchDistance();
+    if(lastPinchDist && dist) {
+      const factor = dist / lastPinchDist;
+      const L = layers[activeLayer];
+      // update scale anchored at canvas center of pinch midpoint
+      const mid = getPinchMidpoint();
+      // slight smoothing
+      L.scale *= factor;
+      // clamp
+      L.scale = Math.max(0.2, Math.min(5, L.scale));
+      lastPinchDist = dist;
+      draw();
+    } else {
+      lastPinchDist = dist;
+    }
+  }
+});
 
-  function applyEffect(ctx, canvas, type) {
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
-    for (let i = 0; i < data.length; i += 4) {
-      let r = data[i], g = data[i + 1], b = data[i + 2];
-      if (type === "bw") {
-        const avg = (r + g + b) / 3;
-        data[i] = data[i + 1] = data[i + 2] = avg;
-      } else if (type === "sepia") {
-        data[i] = r * 0.393 + g * 0.769 + b * 0.189;
-        data[i + 1] = r * 0.349 + g * 0.686 + b * 0.168;
-        data[i + 2] = r * 0.272 + g * 0.534 + b * 0.131;
-      } else if (type === "cold") {
-        data[i] = r * 0.8;
-        data[i + 1] = g * 0.9;
-        data[i + 2] = Math.min(b * 1.2, 255);
+canvas.addEventListener('pointerup', (ev) => {
+  pointers.delete(ev.pointerId);
+  // stop dragging if was dragging
+  for(let key of ['atatürk','ataturk','ataturk','user']) {
+    // normalize property names (we use 'ataturk' key)
+  }
+  if(layers.ataturk.dragging && layers.ataturk.dragPointerId === ev.pointerId) { layers.ataturk.dragging=false; delete layers.ataturk.dragPointerId;}
+  if(layers.user.dragging && layers.user.dragPointerId === ev.pointerId) { layers.user.dragging=false; delete layers.user.dragPointerId;}
+  lastPinchDist = null;
+});
+
+canvas.addEventListener('pointercancel', (ev) => {
+  pointers.delete(ev.pointerId);
+  lastPinchDist = null;
+});
+
+// wheel zoom for active layer (mouse)
+canvas.addEventListener('wheel', (ev) => {
+  ev.preventDefault();
+  const L = layers[activeLayer];
+  const delta = -ev.deltaY * 0.0015;
+  L.scale *= (1 + delta);
+  L.scale = Math.max(0.2, Math.min(5, L.scale));
+  draw();
+}, {passive:false});
+
+// helpers
+function getPinchDistance(){
+  const pts = Array.from(pointers.values());
+  if(pts.length<2) return null;
+  const a = pts[0], b = pts[1];
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+function getPinchMidpoint(){
+  const pts = Array.from(pointers.values());
+  if(pts.length<2) return {x: canvas.width/2, y: canvas.height/2};
+  const a = pts[0], b = pts[1];
+  // convert client coords to canvas coords
+  const rect = canvas.getBoundingClientRect();
+  return {x: ((a.x+b.x)/2 - rect.left) * (canvas.width/rect.width), y: ((a.y+b.y)/2 - rect.top) * (canvas.height/rect.height)};
+}
+
+// Blend & final effect
+blendBtn.addEventListener('click', () => {
+  // draw current workCanvas into an offscreen canvas at same size
+  const off = document.createElement('canvas');
+  off.width = canvas.width; off.height = canvas.height;
+  const octx = off.getContext('2d');
+  // draw current view (layers already rendered by draw())
+  // call draw to ensure latest
+  draw();
+  // copy current canvas pixels
+  octx.drawImage(canvas, 0, 0);
+  // apply final effect on offscreen
+  const effect = finalEffectSel.value;
+  if(effect !== 'normal'){
+    const id = octx.getImageData(0,0,off.width,off.height);
+    const d = id.data;
+    for(let i=0;i<d.length;i+=4){
+      let r=d[i], g=d[i+1], b=d[i+2];
+      if(effect==='grayscale'){
+        const avg=(r+g+b)/3; d[i]=d[i+1]=d[i+2]=avg;
+      } else if(effect==='sepia'){
+        d[i]   = Math.min(255, r*0.393 + g*0.769 + b*0.189);
+        d[i+1] = Math.min(255, r*0.349 + g*0.686 + b*0.168);
+        d[i+2] = Math.min(255, r*0.272 + g*0.534 + b*0.131);
+      } else if(effect==='cool'){
+        d[i] = Math.min(255, r*0.9);
+        d[i+1] = Math.min(255, g*0.9);
+        d[i+2] = Math.min(255, b*1.2);
       }
     }
-    ctx.putImageData(imageData, 0, 0);
+    octx.putImageData(id,0,0);
   }
+  // show preview
+  finalPreviewBox.style.display = 'block';
+  finalPreviewImg.src = off.toDataURL('image/png');
+});
 
-  downloadButton.addEventListener("click", () => {
-    const quality = parseFloat(downloadQuality.value) || 1;
-    const off = document.createElement("canvas");
-    off.width = canvas.width;
-    off.height = canvas.height;
-    const octx = off.getContext("2d");
-    drawCanvas();
-    octx.drawImage(canvas, 0, 0);
-    const link = document.createElement("a");
-    link.download = "birlesik-yuz.png";
-    link.href = off.toDataURL("image/png", quality);
-    link.click();
-  });
-  </script>
+// download current final preview or current canvas if no preview
+downloadBtn.addEventListener('click', () => {
+  let src;
+  if(finalPreviewImg.src){
+    src = finalPreviewImg.src;
+  } else {
+    // if no preview, draw current view and use canvas data
+    draw();
+    src = canvas.toDataURL('image/png');
+  }
+  const a = document.createElement('a');
+  a.href = src;
+  a.download = 'birlesik-yuz.png';
+  a.click();
+});
+
+// initial draw placeholder
+draw();
+
+// Resize handling: scale canvas pixel size to display size for crispness
+function resizeCanvasToDisplay(){
+  const rect = canvas.getBoundingClientRect();
+  const DPR = window.devicePixelRatio || 1;
+  canvas.width = Math.round(rect.width * DPR);
+  canvas.height = Math.round(rect.height * DPR);
+  // scale contexts accordingly: we already draw in canvas pixels so keep transforms
+  // adjust layers positions relative to new size if desired (simple approach: keep center)
+  // keep existing x,y in pixel coordinates; when resizing we map them proportionally
+  // For simplicity we will re-center layers
+  layers.ataturk.x = canvas.width*0.25;
+  layers.ataturk.y = canvas.height*0.5;
+  layers.user.x = canvas.width*0.75;
+  layers.user.y = canvas.height*0.5;
+  // reset last pinch dist
+  lastPinchDist = null;
+  draw();
+}
+
+// On window resize, adjust canvas CSS height; here we will set canvas display width via CSS
+function fitCanvasDisplay(){
+  const wrap = document.getElementById('canvasWrap');
+  const rect = wrap.getBoundingClientRect();
+  const DPR = window.devicePixelRatio || 1;
+  // set canvas element style width to wrap width, and height to 60vh or fixed ratio
+  canvas.style.width = Math.min(rect.width, 900) + 'px';
+  canvas.style.height = (window.innerHeight*0.5) + 'px';
+  resizeCanvasToDisplay();
+}
+window.addEventListener('resize', ()=> { fitCanvasDisplay(); });
+fitCanvasDisplay();
+
+</script>
 </body>
 </html>
