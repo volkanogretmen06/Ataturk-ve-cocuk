@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atatürk ile Yüz Birleştirici</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Poppins", sans-serif;
+      background: radial-gradient(circle at top, #0a0a0a, #1e1e1e);
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    header {
+      padding: 2rem 1rem;
+      background: linear-gradient(135deg, #2c2c2c, #000000);
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05);
+      position: relative;
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      animation: moveLine 3s linear infinite;
+    }
+
+    @keyframes moveLine {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin: 0;
+      color: #00c6ff;
+      letter-spacing: 1px;
+    }
+
+    main {
+      padding: 2rem 1rem;
+    }
+
+    #canvasContainer {
+      position: relative;
+      display: inline-block;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0, 198, 255, 0.4);
+    }
+
+    canvas {
+      width: 100%;
+      max-width: 380px;
+      border-radius: 16px;
+      background: #111;
+      touch-action: none;
+    }
+
+    #guide {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: rgba(0, 198, 255, 0.8);
+      pointer-events: none;
+      transition: left 0.2s;
+    }
+
+    .controls {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.8rem;
+    }
+
+    input[type="file"] {
+      background: #0072ff;
+      color: white;
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+    }
+
+    button {
+      background: #00c6ff;
+      border: none;
+      color: white;
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #0072ff;
+      transform: scale(1.05);
+    }
+
+    footer {
+      margin-top: 3rem;
+      padding: 2rem 1rem;
+      background: #111;
+      border-top: 1px solid #333;
+    }
+
+    footer h2 {
+      color: #00c6ff;
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    footer p {
+      max-width: 700px;
+      margin: 0.5rem auto;
+      color: #ccc;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    #splitRange {
+      width: 80%;
+      margin-top: 1rem;
+    }
+
+    .social {
+      margin-top: 2rem;
+    }
+
+    .social a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      background: #E1306C;
+      color: white;
+      padding: 0.7rem 1.2rem;
+      border-radius: 12px;
+      transition: 0.3s;
+      font-weight: 500;
+    }
+
+    .social a:hover {
+      background: #c52a5f;
+      transform: scale(1.05);
+    }
+
+    .social img {
+      width: 24px;
+      height: 24px;
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 1.6rem; }
+      canvas { max-width: 90vw; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Atatürk ile Yüz Birleştirici</h1>
+  </header>
+
+  <main>
+    <div id="canvasContainer">
+      <canvas id="mainCanvas" width="400" height="500"></canvas>
+      <div id="guide" style="left:50%"></div>
+    </div>
+
+    <div class="controls">
+      <label>
+        📷 Fotoğraf Yükle:
+        <input type="file" id="userInput" accept="image/*">
+      </label>
+      <button id="resetBtn">Sıfırla</button>
+      <button id="downloadBtn">Görseli İndir</button>
+    </div>
+
+    <div style="margin-top:1.5rem;">
+      <label for="splitRange">Birleşme Oranı: <span id="splitVal">50</span>%</label><br>
+      <input type="range" id="splitRange" min="0" max="100" value="50">
+    </div>
+  </main>
+
+  <footer>
+    <h2>📘 Hakkında</h2>
+    <p>
+      Bu mini uygulama, Gazi Mustafa Kemal Atatürk’ün bir portresi ile kendi fotoğrafınızı birleştirmenize olanak tanır.
+      Burun, göz ve ağız hizalamasını yakınlaştırma/taşıma hareketleriyle kolayca ayarlayabilirsiniz.
+    </p>
+    <h2>💡 Kullanım Talimatı</h2>
+    <p>
+      1️⃣ “Fotoğraf Yükle” butonuyla kendi görselinizi seçin.<br>
+      2️⃣ İki parmakla yakınlaştırın veya sürükleyin (mobilde).<br>
+      3️⃣ “Birleşme Oranı” kaydırıcısı ile geçiş çizgisini ayarlayın.<br>
+      4️⃣ “Görseli İndir” butonuyla sonucu kaydedin.<br>
+      5️⃣ “Sıfırla” ile başa dönün.
+    </p>
+
+    <div class="social">
+      <h2>📲 Paylaş & Takip Et</h2>
+      <p>Görselini paylaşmak istersen, bizi etiketlemeyi unutma!</p>
+      <a href="https://www.instagram.com/volkanogretmen06" target="_blank">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" />
+        Instagram’da <strong>@volkanogretmen06</strong>
+      </a>
+    </div>
+
+    <p style="margin-top:1.5rem; color:#777;">© 2025 Atatürk Görsel Birleştirici — Eğitim Amaçlı Kullanım</p>
+  </footer>
+
+  <script>
+  const canvas = document.getElementById("mainCanvas");
+  const ctx = canvas.getContext("2d");
+  const userInput = document.getElementById("userInput");
+  const splitRange = document.getElementById("splitRange");
+  const splitVal = document.getElementById("splitVal");
+  const downloadBtn = document.getElementById("downloadBtn");
+  const resetBtn = document.getElementById("resetBtn");
+  const guide = document.getElementById("guide");
+
+  let ataturkImg = new Image();
+  let userImg = new Image();
+  let userPos = { x: canvas.width/2, y: canvas.height/2, scale: 1, dragging: false, offsetX:0, offsetY:0 };
+  let splitPercent = 50;
+
+  ataturkImg.src = "https://upload.wikimedia.org/wikipedia/commons/1/1f/Ataturk1930s.jpg";
+  ataturkImg.onload = () => draw();
+
+  userInput.onchange = e => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      userImg = new Image();
+      userImg.onload = () => draw();
+      userImg.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  splitRange.oninput = e => {
+    splitPercent = e.target.value;
+    splitVal.textContent = splitPercent;
+    guide.style.left = splitPercent + "%";
+    draw();
+  };
+
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const half = canvas.width * splitPercent/100;
+    ctx.drawImage(ataturkImg, 0, 0, half, canvas.height, 0, 0, half, canvas.height);
+    if(userImg.src){
+      const w = userImg.width * userPos.scale;
+      const h = userImg.height * userPos.scale;
+      const x = userPos.x - w/2;
+      const y = userPos.y - h/2;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(half,0,canvas.width-half,canvas.height);
+      ctx.clip();
+      ctx.drawImage(userImg,x,y,w,h);
+      ctx.restore();
+    }
+  }
+
+  let lastTouchDist = 0;
+  canvas.addEventListener("mousedown", e=>{
+    userPos.dragging = true;
+    userPos.offsetX = e.offsetX - userPos.x;
+    userPos.offsetY = e.offsetY - userPos.y;
+  });
+  canvas.addEventListener("mouseup", ()=> userPos.dragging = false);
+  canvas.addEventListener("mouseleave", ()=> userPos.dragging = false);
+  canvas.addEventListener("mousemove", e=>{
+    if(userPos.dragging){
+      userPos.x = e.offsetX - userPos.offsetX;
+      userPos.y = e.offsetY - userPos.offsetY;
+      draw();
+    }
+  });
+  canvas.addEventListener("wheel", e=>{
+    e.preventDefault();
+    userPos.scale *= e.deltaY < 0 ? 1.05 : 0.95;
+    draw();
+  });
+
+  canvas.addEventListener("touchstart", e=>{
+    if(e.touches.length===1){
+      const t = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      userPos.dragging = true;
+      userPos.offsetX = t.clientX - rect.left - userPos.x;
+      userPos.offsetY = t.clientY - rect.top - userPos.y;
+    } else if(e.touches.length===2){
+      lastTouchDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+    }
+  });
+  canvas.addEventListener("touchmove", e=>{
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    if(e.touches.length===1 && userPos.dragging){
+      const t = e.touches[0];
+      userPos.x = t.clientX - rect.left - userPos.offsetX;
+      userPos.y = t.clientY - rect.top - userPos.offsetY;
+      draw();
+    } else if(e.touches.length===2){
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const delta = dist / lastTouchDist;
+      userPos.scale *= delta;
+      lastTouchDist = dist;
+      draw();
+    }
+  });
+  canvas.addEventListener("touchend", ()=> userPos.dragging=false);
+
+  resetBtn.onclick = ()=>{
+    userPos = { x: canvas.width/2, y: canvas.height/2, scale: 1, dragging: false, offsetX:0, offsetY:0 };
+    splitPercent = 50;
+    splitRange.value = 50;
+    splitVal.textContent = 50;
+    guide.style.left = "50%";
+    draw();
+  };
+
+  downloadBtn.onclick = ()=>{
+    const a = document.createElement("a");
+    a.download = "ataturk-birlesim.png";
+    a.href = canvas.toDataURL("image/png");
+    a.click();
+  };
+  </script>
+</body>
+</html>
